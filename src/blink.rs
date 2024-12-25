@@ -18,6 +18,7 @@ pub struct Blink {
 impl Blink {
     fn _get_next_event(average_interval: Duration, interval_variation: Duration) -> Duration {
         // TODO fix the new rand to be created in proper location
+        // I need to look into how constants in structs work, and access
         let mut rng = rand::thread_rng();
 
         // Try to create the interval for the next blink

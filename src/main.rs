@@ -18,7 +18,9 @@ fn main() {
     let mut blink = Blink::new();
     let mut tilt = TiltEyelids {};
 
-    while true {
+    loop {
+        // TODO get input here
+
         // Move the eyes
         eyes.look(0, 0);
         eyes.move_eyelids(1.0, 1.0);
@@ -27,5 +29,7 @@ fn main() {
         let new_eyes = eyes
             .transform(&mut blink)
             .transform(&mut tilt);
+
+        // TODO apply eye state to servo controller here
     }
 }
