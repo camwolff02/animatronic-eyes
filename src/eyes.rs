@@ -7,11 +7,11 @@ pub trait Transformation {
 }
 
 pub struct EyeState {
-    horiz_angle: i32,            // centered at 0 degrees
-    vert_angle: i32,             // centered at 0 degrees
-    eyelid_tilt_angle: i32,      // centered at 0 degrees
-    left_eyelid_gap: f32, // closed at 0.0, open at 1.0
-    right_eyelid_gap: f32, // closed at 0.0, open at 1.0
+    horiz_angle: i32,          // centered at 0 degrees
+    vert_angle: i32,           // centered at 0 degrees
+    eyelid_tilt_angle: i32,    // centered at 0 degrees
+    pub left_eyelid_gap: u32,  // closed at 0, open at 100
+    pub right_eyelid_gap: u32, // closed at 0, open at 100
 }
 
 impl Clone for EyeState {
@@ -33,8 +33,8 @@ impl EyeState {
             horiz_angle: 0,
             vert_angle: 0,
             eyelid_tilt_angle: 0,
-            left_eyelid_gap: 1.,
-            right_eyelid_gap: 1.,
+            left_eyelid_gap: 1,
+            right_eyelid_gap: 1,
         }
     }
 
@@ -46,18 +46,18 @@ impl EyeState {
 
     // x = forward, y = left, z = up
     pub fn look_at_point(&mut self, x: f32, y: f32, z: f32) {
-        // Calculate the arc tangent for each position to get the angle, 
-        // round to the nearest integer degree, and clamp to the usable 
+        // Calculate the arc tangent for each position to get the angle,
+        // round to the nearest integer degree, and clamp to the usable
         // range of the eye
-        let horiz_angle = (x / z).atan().round() as i32;
-        let vert_angle = (z / y).atan().round() as i32;
+        let horiz_angle = (x).atan2(z).round() as i32;
+        let vert_angle = (z).atan2(y).round() as i32;
         self.look(horiz_angle, vert_angle);
     }
 
-    pub fn move_eyelids(&mut self, left_eyelid_gap: f32, right_eyelid_gap: f32) {
+    pub fn move_eyelids(&mut self, left_eyelid_gap: u32, right_eyelid_gap: u32) {
         // Ensure eyelid gaps are a proportion
-        self.left_eyelid_gap = left_eyelid_gap.clamp(0.0, 1.0);
-        self.right_eyelid_gap = right_eyelid_gap.clamp(0.0, 1.0);
+        self.left_eyelid_gap = left_eyelid_gap.clamp(0, 100);
+        self.right_eyelid_gap = right_eyelid_gap.clamp(0, 100);
     }
 
     // Defining additional generic transformations on the eye

@@ -4,16 +4,14 @@ use rand::Rng;
 
 use crate::eyes::{EyeState, Transformation};
 
-/* TODO MOVE TO OTHER FILE */
 pub struct Blink {
-    duration: Duration,  // ms
+    duration: Duration, // ms
     average_interval: Duration,
     interval_variation: Duration,
     _blinking: bool,
     _last_event_time: Instant,
     _next_event_time: Instant,
 }
-
 
 impl Blink {
     fn _get_next_event(average_interval: Duration, interval_variation: Duration) -> Duration {
@@ -23,14 +21,18 @@ impl Blink {
 
         // Try to create the interval for the next blink
         let min_ = u64::try_from(
-            average_interval.checked_sub(interval_variation)
+            average_interval
+                .checked_sub(interval_variation)
                 .unwrap_or_default()
-                .as_millis());
+                .as_millis(),
+        );
 
         let max_ = u64::try_from(
-            average_interval.checked_add(interval_variation)
+            average_interval
+                .checked_add(interval_variation)
                 .unwrap_or_default()
-                .as_millis());
+                .as_millis(),
+        );
 
         // TODO can this be cleaner?
         // Select a random blink time in the next interval, or just the average if
@@ -38,11 +40,14 @@ impl Blink {
         match min_ {
             Ok(min) => match max_ {
                 Ok(max) => Duration::from_millis(rng.gen_range(min..max)),
-                Err(_) => Duration::from_millis(u64::try_from(average_interval.as_millis()).unwrap_or_default())
-            }
-            Err(_) => Duration::from_millis(u64::try_from(average_interval.as_millis()).unwrap_or_default())
+                Err(_) => Duration::from_millis(
+                    u64::try_from(average_interval.as_millis()).unwrap_or_default(),
+                ),
+            },
+            Err(_) => Duration::from_millis(
+                u64::try_from(average_interval.as_millis()).unwrap_or_default(),
+            ),
         }
-
     }
 
     pub fn new() -> Self {
@@ -56,7 +61,7 @@ impl Blink {
             interval_variation,
             _blinking: false,
             _last_event_time: now,
-            _next_event_time: now + Self::_get_next_event(average_interval, interval_variation)
+            _next_event_time: now + Self::_get_next_event(average_interval, interval_variation),
         }
     }
 
@@ -65,7 +70,6 @@ impl Blink {
         blink.duration = Duration::from_millis(duration);
         blink
     }
-
 }
 
 impl Transformation for Blink {
@@ -73,22 +77,23 @@ impl Transformation for Blink {
     // Otherwise, transform does nothing
     fn transform(&mut self, eye_state: &mut EyeState) {
         let now = Instant::now();
-        
+
         if self._blinking {
             // if we are blinking, close our eyes
-            eye_state.eyelid_separation_dist = 0.;
+            eye_state.left_eyelid_gap = 0.;
+            eye_state.right_eyelid_gap = 0.;
 
-            // if we have reached the end of our blink, 
+            // if we have reached the end of our blink,
             // stop blinking and decide when we'll blink next
             if self._last_event_time - now > self.duration {
                 self._blinking = false;
                 self._last_event_time = now;
-                self._next_event_time = now + Self::_get_next_event(self.average_interval, self.interval_variation)
-            } 
+                self._next_event_time =
+                    now + Self::_get_next_event(self.average_interval, self.interval_variation)
+            }
         } else if now == self._next_event_time {
             // if it's time to blink, start a blink
             self._blinking = true;
         }
-        
     }
 }

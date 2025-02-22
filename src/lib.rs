@@ -1,14 +1,11 @@
 mod blink;
 mod eyes;
+mod tilt;
 
 use blink::Blink;
-use eyes::{EyeState, Transformation};
-
-/* TODO MOVE TO OTHER FILE */
-struct TiltEyelids {}
-impl Transformation for TiltEyelids {
-    fn transform(&mut self, eye_state: &mut EyeState) {}
-}
+use tilt::TiltEyelids;
+use eyes::EyeState;
+use saccade::SaccadeBlink;
 
 fn main() {
     // Define eyes
@@ -16,7 +13,8 @@ fn main() {
 
     // Define transformations on eyes
     let mut blink = Blink::new();
-    let mut tilt = TiltEyelids {};
+    let mut tilt = TiltEyelids::new(0.5);
+    let mut saccade = SaccadeBlink::new();
 
     loop {
         // TODO get input here
@@ -28,7 +26,8 @@ fn main() {
         // Then apply realistic transformations
         let new_eyes = eyes
             .transform(&mut blink)
-            .transform(&mut tilt);
+            .transform(&mut tilt)
+            .transform(&mut saccade);
 
         // TODO apply eye state to servo controller here
     }
