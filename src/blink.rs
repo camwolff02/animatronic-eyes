@@ -3,6 +3,7 @@ use std::time::{Duration, Instant};
 use rand::Rng;
 
 use crate::eyes::{EyeState, Transformation};
+use crate::constants::*;
 
 pub struct Blink {
     duration: Duration, // ms
@@ -51,12 +52,12 @@ impl Blink {
     }
 
     pub fn new() -> Self {
-        let average_interval = Duration::from_secs(1);
-        let interval_variation = Duration::from_millis(500);
+        let average_interval = Duration::from_millis(BLINK_INTERVAL_MS);
+        let interval_variation = Duration::from_millis(BLINK_INTERVAL_VARIATION_MS);
         let now = Instant::now();
 
         Self {
-            duration: Duration::from_millis(10),
+            duration: Duration::from_millis(BLINK_DURATION_MS),
             average_interval,
             interval_variation,
             _blinking: false,
@@ -70,6 +71,18 @@ impl Blink {
         blink.duration = Duration::from_millis(duration);
         blink
     }
+
+    // allow for externally triggering blink
+    pub fn start_blink(&mut self) {
+        self._blinking = true; 
+    }
+
+}
+
+impl Default for Blink {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Transformation for Blink {
@@ -80,8 +93,8 @@ impl Transformation for Blink {
 
         if self._blinking {
             // if we are blinking, close our eyes
-            eye_state.left_eyelid_gap = 0.;
-            eye_state.right_eyelid_gap = 0.;
+            eye_state.left_eyelid_gap = 0;
+            eye_state.right_eyelid_gap = 0;
 
             // if we have reached the end of our blink,
             // stop blinking and decide when we'll blink next

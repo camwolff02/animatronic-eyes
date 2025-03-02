@@ -1,5 +1,6 @@
 use crate::eyes::{EyeState, Transformation};
 
+// NOTE I wrote this wrong. Should be rewritten so eyelids tilt with the eye's movement
 pub struct TiltEyelids {
     threshold: i32  // between 0 and 100
 }
